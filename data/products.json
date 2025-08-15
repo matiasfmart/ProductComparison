@@ -1,0 +1,30 @@
+[
+  {
+    "id": "kbd-redragon-k552",
+    "name": "Redragon K552 Kumara",
+    "imageUrl": "https://cdn.example/redragon/k552.jpg",
+    "description": "Teclado mec�nico TKL",
+    "price": 49.99,
+    "currency": "USD",
+    "rating": 4.5,
+    "specifications": {
+      "Switch": "Outemu Blue",
+      "FormFactor": "TKL",
+      "Backlight": "RGB"
+    }
+  },
+  {
+    "id": "hx-cloud2",
+    "name": "HyperX Cloud II",
+    "imageUrl": "https://cdn.example/hyperx/cloud2.jpg",
+    "description": "Auriculares gaming",
+    "price": 79.99,
+    "currency": "USD",
+    "rating": 4.6,
+    "specifications": {
+      "Driver": "53mm",
+      "Connection": "Wired",
+      "Surround": "7.1"
+    }
+  }
+]
