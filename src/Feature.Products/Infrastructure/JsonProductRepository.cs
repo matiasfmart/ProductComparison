@@ -1,9 +1,10 @@
-﻿using System.Security.Cryptography;
+﻿using BuildingBlocks.Configuration;
+using Features.Products.Domain;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
-using BuildingBlocks.Configuration;
-using Features.Products.Domain;
-using Microsoft.Extensions.Options;
 
 namespace Features.Products.Infrastructure;
 
@@ -14,10 +15,13 @@ public sealed class JsonProductRepository : IProductRepository, IDisposable
     private Dictionary<string, Product> _byId = new(StringComparer.OrdinalIgnoreCase);
     private string _etag = "\"init\"";
     private FileSystemWatcher? _watcher;
+    private readonly ILogger<JsonProductRepository> _log;
 
-    public JsonProductRepository(IOptions<DataOptions> opts)
+    public JsonProductRepository(IOptions<DataOptions> opts, ILogger<JsonProductRepository> log) 
     {
+        _log = log;                                                                              
         _path = opts.Value.FilePath ?? "data/products.json";
+        _log.LogInformation("Repository initialized with path {path}", _path);                   
         Load();
         StartWatcher();
     }
@@ -36,6 +40,7 @@ public sealed class JsonProductRepository : IProductRepository, IDisposable
             EnableRaisingEvents = true,
             NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size
         };
+        _log.LogInformation("Watcher started for {file}", file);
         _watcher.Changed += (_, __) => Load();
         _watcher.Created += (_, __) => Load();
         _watcher.Renamed += (_, __) => Load();
@@ -51,6 +56,7 @@ public sealed class JsonProductRepository : IProductRepository, IDisposable
             {
                 _byId = new(StringComparer.OrdinalIgnoreCase);
                 _etag = "\"empty\"";
+                _log.LogWarning("File {path} not found. Cache empty", _path);
                 return;
             }
 
@@ -63,12 +69,15 @@ public sealed class JsonProductRepository : IProductRepository, IDisposable
             _byId = items.ToDictionary(p => p.Id, StringComparer.OrdinalIgnoreCase);
             var serialized = JsonSerializer.Serialize(items);
             _etag = $"\"{ComputeHash(serialized)}\"";
+
+            _log.LogInformation("Loaded {count} products. New ETag {etag}", _byId.Count, _etag);
         }
-        catch
+        catch (Exception ex)
         {
             //si hay error leyendo dejamos el cache vacío con ETag 'error'
             _byId = new(StringComparer.OrdinalIgnoreCase);
             _etag = "\"error\"";
+            _log.LogError(ex, "Error loading products from {path}", _path);
         }
         finally
         {

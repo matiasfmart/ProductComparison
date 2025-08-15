@@ -43,12 +43,18 @@ app.UseExceptionHandler(errorApp =>
 {
     errorApp.Run(async context =>
     {
+        //log de la excepción con stack trace
+        var feature = context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerFeature>();
+        if (feature?.Error is not null)
+            app.Logger.LogError(feature.Error, "Unhandled exception");
+
         var problem = ProblemDetailsFactoryEx.FromUnhandled(context);
         context.Response.ContentType = "application/problem+json";
         context.Response.StatusCode = problem.Status ?? StatusCodes.Status500InternalServerError;
         await context.Response.WriteAsJsonAsync(problem);
     });
 });
+
 
 if (app.Environment.IsDevelopment())
 {
@@ -67,3 +73,4 @@ var products = v1.MapGroup("/products").HasApiVersion(1, 0).WithTags("Products")
 products.MapGetByIds();
 
 app.Run();
+public partial class Program { }
