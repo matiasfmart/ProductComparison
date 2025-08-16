@@ -8,6 +8,9 @@ using System.Text.Json;
 
 namespace Features.Products.Infrastructure;
 
+/// <summary>
+/// Repository implementation for retrieving products from a JSON file with ETag and file watcher support.
+/// </summary>
 public sealed class JsonProductRepository : IProductRepository, IDisposable
 {
     private readonly ReaderWriterLockSlim _lock = new();
@@ -17,15 +20,23 @@ public sealed class JsonProductRepository : IProductRepository, IDisposable
     private FileSystemWatcher? _watcher;
     private readonly ILogger<JsonProductRepository> _log;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="JsonProductRepository"/> class.
+    /// </summary>
+    /// <param name="opts">The data options for file path configuration.</param>
+    /// <param name="log">The logger instance.</param>
     public JsonProductRepository(IOptions<DataOptions> opts, ILogger<JsonProductRepository> log) 
     {
-        _log = log;                                                                              
+        _log = log;                                                                               
         _path = opts.Value.FilePath ?? "data/products.json";
         _log.LogInformation("Repository initialized with path {path}", _path);                   
         Load();
         StartWatcher();
     }
 
+    /// <summary>
+    /// Starts the file system watcher to monitor changes in the JSON file.
+    /// </summary>
     private void StartWatcher()
     {
         var full = Path.GetFullPath(_path);
@@ -46,7 +57,9 @@ public sealed class JsonProductRepository : IProductRepository, IDisposable
         _watcher.Renamed += (_, __) => Load();
     }
 
-
+    /// <summary>
+    /// Loads products from the JSON file into memory and updates the ETag.
+    /// </summary>
     private void Load()
     {
         _lock.EnterWriteLock();
@@ -85,6 +98,12 @@ public sealed class JsonProductRepository : IProductRepository, IDisposable
         }
     }
 
+    /// <summary>
+    /// Retrieves products by their IDs from the in-memory cache.
+    /// </summary>
+    /// <param name="ids">The collection of product IDs to retrieve.</param>
+    /// <param name="ct">The cancellation token.</param>
+    /// <returns>A tuple containing the list of found products, the ETag, and a list of missing IDs.</returns>
     public Task<(IReadOnlyList<Product>, string, IReadOnlyList<string>)> GetByIdsAsync(IEnumerable<string> ids, CancellationToken ct)
     {
         _lock.EnterReadLock();
@@ -106,6 +125,11 @@ public sealed class JsonProductRepository : IProductRepository, IDisposable
         }
     }
 
+    /// <summary>
+    /// Computes a SHA256 hash for the given content string.
+    /// </summary>
+    /// <param name="content">The content to hash.</param>
+    /// <returns>The computed hash as a hexadecimal string.</returns>
     private static string ComputeHash(string content)
     {
         using var sha = SHA256.Create();
@@ -113,5 +137,8 @@ public sealed class JsonProductRepository : IProductRepository, IDisposable
         return Convert.ToHexString(sha.ComputeHash(bytes));
     }
 
+    /// <summary>
+    /// Disposes the file system watcher.
+    /// </summary>
     public void Dispose() => _watcher?.Dispose();
 }

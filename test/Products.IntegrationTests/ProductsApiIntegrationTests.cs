@@ -1,5 +1,6 @@
-using Products.IntegrationTests;
 using System.Net;
+
+namespace Products.IntegrationTests;
 
 public class ProductsApiIntegrationTests : IClassFixture<ApiFactory>
 {

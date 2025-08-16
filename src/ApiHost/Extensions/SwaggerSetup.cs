@@ -4,8 +4,16 @@ using Microsoft.OpenApi.Models;
 
 namespace ApiHost.Extensions;
 
+/// <summary>
+/// Provides extension methods to configure Swagger with API versioning.
+/// </summary>
 public static class SwaggerSetup
 {
+    /// <summary>
+    /// Adds Swagger generation and API versioning support to the service collection.
+    /// </summary>
+    /// <param name="services">The service collection to add Swagger and versioning to.</param>
+    /// <returns>The updated <see cref="IServiceCollection"/>.</returns>
     public static IServiceCollection AddSwaggerWithVersioning(this IServiceCollection services)
     {
         services.AddEndpointsApiExplorer();
@@ -31,6 +39,12 @@ public static class SwaggerSetup
         return services;
     }
 
+    /// <summary>
+    /// Configures the application to use Swagger and Swagger UI with API versioning support.
+    /// </summary>
+    /// <param name="app">The web application instance.</param>
+    /// <param name="provider">The API version description provider.</param>
+    /// <returns>The configured <see cref="WebApplication"/>.</returns>
     public static WebApplication UseSwaggerWithUI(this WebApplication app, IApiVersionDescriptionProvider provider)
     {
         app.UseSwagger();

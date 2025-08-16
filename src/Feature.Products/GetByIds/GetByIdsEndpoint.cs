@@ -7,8 +7,16 @@ using Microsoft.Extensions.Logging;
 
 namespace Features.Products.GetByIds;
 
+/// <summary>
+/// Provides endpoint mapping for retrieving multiple products by their IDs.
+/// </summary>
 public static class GetByIdsEndpoint
 {
+    /// <summary>
+    /// Maps the GET endpoint for retrieving product details by IDs.
+    /// </summary>
+    /// <param name="group">The route group builder to add the endpoint to.</param>
+    /// <returns>The updated <see cref="RouteGroupBuilder"/>.</returns>
     public static RouteGroupBuilder MapGetByIds(this RouteGroupBuilder group)
     {
         group.MapGet("",

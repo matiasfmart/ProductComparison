@@ -44,7 +44,7 @@ Middleware funcional integrado en `Program.cs` que añade correlación y logging
 
 ---
 
-## 3. README y run.md
+## README y run.md
 ### Herramienta: Copilot Agent
 
 **Contexto:**  
@@ -62,7 +62,26 @@ Plantilla de README y run.md ajustadas manualmente al código real.
 
 ---
 
-## 4. Tests unitarios
+## Documentación con XML Comments para Swagger
+### Herramienta: Copilot Agent
+
+**Contexto:**  
+Agregar documentación en todos los archivos del servicio para que Swagger muestre los contratos y descripciones en la interfaz web.
+
+**Prompt:**  
+```
+
+Genera los XML comments de Swagger para el archivo activo. Utiliza descripciones claras, sin inventar contratos nuevos.
+
+```
+
+**Resultado esperado:**  
+Cada archivo contiene comentarios /// compatibles con la opción <GenerateDocumentationFile> en el .csproj.
+Swagger UI muestra automáticamente las descripciones generadas para endpoints, parámetros y modelos.
+
+---
+
+## Tests unitarios
 ### Herramienta: Copilot Agent
 
 **Contexto:**  
@@ -82,7 +101,7 @@ Tests con Moq que cubren todos los escenarios.
 
 ---
 
-## 5. Propuesta de Loggers en archivos 
+## Propuesta de Loggers en archivos 
 ### Herramienta: Copilot Agent
 
 **Contexto:**  
