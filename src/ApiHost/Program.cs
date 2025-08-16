@@ -1,4 +1,6 @@
-﻿using Asp.Versioning;
+﻿using ApiHost.Extensions;
+using Asp.Versioning;
+using Asp.Versioning.ApiExplorer;
 using BuildingBlocks.Configuration;
 using BuildingBlocks.Errors;
 using Features.Products.GetByIds;
@@ -8,8 +10,9 @@ using Microsoft.AspNetCore.Mvc;
 var builder = WebApplication.CreateBuilder(args);
 
 //instancio servicios base
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+//builder.Services.AddEndpointsApiExplorer();
+//builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerWithVersioning();
 
 //versionado de API
 builder.Services
@@ -34,7 +37,8 @@ builder.Services.AddScoped<GetByIdsHandler>();
 builder.Services.AddScoped<GetByIdsValidator>();
 
 //agrego health checks
-builder.Services.AddHealthChecks();
+//builder.Services.AddHealthChecks();
+builder.Services.AddApiHealthChecks(builder.Configuration);
 
 var app = builder.Build();
 
@@ -56,15 +60,13 @@ app.UseExceptionHandler(errorApp =>
 });
 
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+var provider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
+app.UseSwaggerWithUI(provider);
 
 //endpoints de health
-app.MapHealthChecks("/health/live");
-app.MapHealthChecks("/health/ready");
+//app.MapHealthChecks("/health/live");
+//app.MapHealthChecks("/health/ready");
+app.MapHealthEndpoints();
 
 var api = app.NewVersionedApi();
 var v1 = api.MapGroup("/api/v{version:apiVersion}");
